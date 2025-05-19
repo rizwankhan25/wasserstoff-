@@ -1,16 +1,18 @@
-# Real-Time Collaborative Text Editor
+# Real-Time Collaborative Text Editor (FrontEndTask2)
 
 A modern, real-time collaborative text editor built with Next.js and Socket.IO. This application allows multiple users to edit text simultaneously, with changes reflected in real-time across all connected clients.
 
 ## Features
 
 - 🔄 Real-time text synchronization
-- 👥 Multiple user support
-- 👤 User presence tracking
-- 💻 Modern, responsive UI with Bootstrap
+- 👥 Multiple user support with username identification
+- 👤 Active user tracking and presence indicators
+- 💻 Modern, responsive UI with Bootstrap 5
 - 🔒 Secure WebSocket connections
 - 🌐 Cross-browser compatibility
 - 📱 Mobile-friendly design
+- ⚡ Fast and efficient real-time updates
+- 🎨 Clean and intuitive user interface
 
 ## Tech Stack
 
@@ -20,6 +22,7 @@ A modern, real-time collaborative text editor built with Next.js and Socket.IO. 
 - **Real-time Communication**: Socket.IO
 - **Deployment**: Netlify
 - **Development**: Node.js
+- **Code Quality**: ESLint
 
 ## Prerequisites
 
@@ -31,7 +34,7 @@ A modern, real-time collaborative text editor built with Next.js and Socket.IO. 
 1. Clone the repository:
    ```bash
    git clone <your-repository-url>
-   cd FrontEndTask1
+   cd FrontEndTask2
    ```
 
 2. Install dependencies:
@@ -49,12 +52,14 @@ A modern, real-time collaborative text editor built with Next.js and Socket.IO. 
 ## Project Structure
 
 ```
-FrontEndTask1/
+FrontEndTask2/
 ├── src/
 │   ├── app/                 # Next.js app directory
+│   │   ├── api/            # API routes
 │   │   ├── editor/         # Editor page component
 │   │   ├── layout.js       # Root layout
-│   │   └── page.js         # Home page
+│   │   ├── page.js         # Home page
+│   │   └── middleware.js   # Next.js middleware
 │   ├── lib/
 │   │   ├── socketClient.js # Socket.IO client configuration
 │   │   └── socketServer.js # Socket.IO server setup
@@ -93,10 +98,28 @@ The project uses the following Netlify features:
 - Next.js plugin for optimized deployment
 - WebSocket support through custom redirects
 - Server-side rendering support
+- Custom middleware for WebSocket handling
 
 ### Environment Variables
 
 No environment variables are required for basic functionality. The application automatically detects the environment and configures WebSocket connections accordingly.
+
+## Key Features Implementation
+
+### Real-time Collaboration
+- Uses Socket.IO for real-time bidirectional communication
+- Implements custom server for WebSocket handling
+- Supports multiple concurrent users
+
+### User Interface
+- Bootstrap 5 for responsive design
+- React Bootstrap components for UI elements
+- Custom styling for enhanced user experience
+
+### Performance
+- Optimized WebSocket connections
+- Efficient state management
+- Minimal re-renders
 
 ## Contributing
 
@@ -115,3 +138,4 @@ This project is licensed under the ISC License.
 - Next.js team for the amazing framework
 - Socket.IO for real-time communication capabilities
 - Bootstrap team for the UI components
+- Netlify for hosting and deployment support

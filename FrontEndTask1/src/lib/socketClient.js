@@ -19,17 +19,21 @@ class SocketClient {
           ? window.location.origin
           : 'http://localhost:3000';
 
+        console.log('Connecting to socket URL:', socketUrl);
+
         this.socket = io(socketUrl, {
           path: '/api/socketio',
           addTrailingSlash: false,
           transports: ['websocket', 'polling'],
           autoConnect: true,
           reconnection: true,
-          reconnectionAttempts: 5,
+          reconnectionAttempts: 10,
           reconnectionDelay: 1000,
           reconnectionDelayMax: 5000,
           timeout: 20000,
-          withCredentials: false
+          withCredentials: true,
+          forceNew: true,
+          upgrade: true
         });
 
         // Set up event handlers
@@ -43,6 +47,11 @@ class SocketClient {
 
         this.socket.on('connect_error', (error) => {
           console.error('Socket connection error:', error);
+          // Attempt to reconnect with polling if websocket fails
+          if (this.socket.io.opts.transports[0] === 'websocket') {
+            console.log('Falling back to polling transport...');
+            this.socket.io.opts.transports = ['polling', 'websocket'];
+          }
         });
 
         this.socket.on('disconnect', (reason) => {
