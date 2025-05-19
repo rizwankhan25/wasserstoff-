@@ -16,7 +16,7 @@ class SocketClient {
         console.log('Attempting to connect to socket server...');
         // Create socket connection
         const socketUrl = process.env.NODE_ENV === 'production' 
-          ? window.location.origin
+          ? 'https://your-backend-url.herokuapp.com' // Replace with your backend URL
           : 'http://localhost:3000';
 
         console.log('Connecting to socket URL:', socketUrl);
@@ -34,8 +34,7 @@ class SocketClient {
           withCredentials: true,
           forceNew: true,
           upgrade: true,
-          rememberUpgrade: true,
-          rejectUnauthorized: false
+          rememberUpgrade: true
         });
 
         // Set up event handlers
@@ -51,12 +50,6 @@ class SocketClient {
         this.socket.on('connect_error', (error) => {
           console.error('Socket connection error:', error);
           console.log('Current transport:', this.socket.io.engine.transport.name);
-          
-          if (this.socket.io.engine.transport.name === 'websocket') {
-            console.log('Switching to polling transport...');
-            this.socket.io.opts.transports = ['polling'];
-            this.socket.connect();
-          }
         });
 
         this.socket.on('disconnect', (reason) => {
