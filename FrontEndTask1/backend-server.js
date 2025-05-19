@@ -6,25 +6,33 @@ const cors = require('cors');
 const app = express();
 const httpServer = createServer(app);
 
-// Enable CORS
+// Enable CORS for all routes
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://wasserstofffrontendtask1.netlify.app'
-    : 'http://localhost:3000',
+  origin: '*', // Allow all origins in development
   methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
+// Add a basic route for health check
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
 const io = new Server(httpServer, {
-  path: '/api/socketio',
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? 'https://wasserstofffrontendtask1.netlify.app'
-      : 'http://localhost:3000',
+    origin: '*', // Allow all origins in development
     methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
   },
-  transports: ['polling', 'websocket']
+  transports: ['polling', 'websocket'],
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  connectTimeout: 45000,
+  allowUpgrades: true,
+  cookie: false
 });
 
 const users = new Set();
@@ -81,6 +89,11 @@ io.on('connection', (socket) => {
   socket.on('error', (error) => {
     console.error('Socket error for client', socket.id, ':', error);
   });
+});
+
+// Error handling for the HTTP server
+httpServer.on('error', (error) => {
+  console.error('Server error:', error);
 });
 
 const PORT = process.env.PORT || 3001;
