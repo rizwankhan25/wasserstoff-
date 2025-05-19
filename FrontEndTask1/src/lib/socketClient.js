@@ -24,21 +24,24 @@ class SocketClient {
         this.socket = io(socketUrl, {
           path: '/api/socketio',
           addTrailingSlash: false,
-          transports: ['websocket', 'polling'],
+          transports: ['polling', 'websocket'],
           autoConnect: true,
           reconnection: true,
-          reconnectionAttempts: 10,
+          reconnectionAttempts: Infinity,
           reconnectionDelay: 1000,
           reconnectionDelayMax: 5000,
           timeout: 20000,
           withCredentials: true,
           forceNew: true,
-          upgrade: true
+          upgrade: true,
+          rememberUpgrade: true,
+          rejectUnauthorized: false
         });
 
         // Set up event handlers
         this.socket.on('connect', () => {
           console.log('Socket connected successfully, socket.id:', this.socket.id);
+          console.log('Transport:', this.socket.io.engine.transport.name);
           console.log('Joining as:', username);
           if (username) {
             this.socket.emit('join', username);
@@ -47,17 +50,21 @@ class SocketClient {
 
         this.socket.on('connect_error', (error) => {
           console.error('Socket connection error:', error);
-          // Attempt to reconnect with polling if websocket fails
-          if (this.socket.io.opts.transports[0] === 'websocket') {
-            console.log('Falling back to polling transport...');
-            this.socket.io.opts.transports = ['polling', 'websocket'];
+          console.log('Current transport:', this.socket.io.engine.transport.name);
+          
+          if (this.socket.io.engine.transport.name === 'websocket') {
+            console.log('Switching to polling transport...');
+            this.socket.io.opts.transports = ['polling'];
+            this.socket.connect();
           }
         });
 
         this.socket.on('disconnect', (reason) => {
           console.log('Socket disconnected:', reason);
+          console.log('Last transport:', this.socket.io.engine.transport.name);
+          
           if (reason === 'io server disconnect') {
-            // the disconnection was initiated by the server, you need to reconnect manually
+            console.log('Attempting to reconnect...');
             this.socket.connect();
           }
         });
@@ -66,7 +73,7 @@ class SocketClient {
         await new Promise((resolve, reject) => {
           const timeout = setTimeout(() => {
             reject(new Error('Connection timeout - server not responding'));
-          }, 5000);
+          }, 10000);
 
           this.socket.once('connect', () => {
             clearTimeout(timeout);
