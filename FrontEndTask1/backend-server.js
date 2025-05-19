@@ -7,41 +7,39 @@ const app = express();
 const httpServer = createServer(app);
 
 // Enable CORS for all routes
-app.use(cors({
-  origin: '*', // Allow all origins in development
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+app.use(cors());
 
 // Add a basic route for health check
 app.get('/', (req, res) => {
+  console.log('Health check endpoint hit');
   res.send('Server is running');
+});
+
+// Add a test endpoint
+app.get('/test', (req, res) => {
+  console.log('Test endpoint hit');
+  res.json({ status: 'ok', message: 'Server is accessible' });
 });
 
 const io = new Server(httpServer, {
   cors: {
-    origin: '*', // Allow all origins in development
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: true,
+    methods: ['GET', 'POST'],
     credentials: true
   },
   transports: ['polling', 'websocket'],
-  allowEIO3: true,
-  pingTimeout: 60000,
-  pingInterval: 25000,
-  connectTimeout: 45000,
-  allowUpgrades: true,
-  cookie: false
+  path: '/socket.io/'
 });
 
 const users = new Set();
 let currentContent = '';
 
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+  console.log('New client connected:', socket.id);
+  console.log('Transport:', socket.conn.transport.name);
 
   socket.on('join', (username) => {
+    console.log('Join event received from:', username);
     if (!username || typeof username !== 'string') {
       socket.emit('error', 'Invalid username');
       return;
@@ -99,4 +97,9 @@ httpServer.on('error', (error) => {
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
+  console.log(`Server URL: http://localhost:${PORT}`);
+  console.log('Available endpoints:');
+  console.log('- GET /');
+  console.log('- GET /test');
+  console.log('- WebSocket: /socket.io/');
 }); 
