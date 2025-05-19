@@ -6,8 +6,7 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "lint": "next lint",
-    "backend": "node backend-server.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "bootstrap": "^5.3.2",

@@ -13,6 +13,10 @@ const nextConfig = {
         source: '/api/socketio',
         destination: '/api/socketio',
       },
+      {
+        source: '/editor',
+        destination: '/editor',
+      }
     ];
   },
   async headers() {
@@ -26,6 +30,14 @@ const nextConfig = {
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
         ],
       },
+      {
+        source: '/editor',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type' },
+        ],
+      }
     ];
   },
 };

@@ -23,8 +23,31 @@ app.prepare().then(() => {
       return;
     }
 
+    // Add explicit test endpoint
+    if (req.url === '/api/test') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ 
+        status: 'ok',
+        message: 'Server is running',
+        timestamp: new Date().toISOString()
+      }));
+      return;
+    }
+
+    // Socket.IO health check
+    if (req.url === '/api/socketio') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ 
+        status: 'ok',
+        message: 'Socket.IO endpoint is available',
+        timestamp: new Date().toISOString()
+      }));
+      return;
+    }
+
     try {
       const parsedUrl = parse(req.url, true);
+      // Let Next.js handle all other routes
       handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Server error:', err);
@@ -33,27 +56,22 @@ app.prepare().then(() => {
     }
   });
 
+  // Create Socket.IO server with minimal configuration
   const io = new Server(server, {
     path: '/api/socketio',
-    addTrailingSlash: false,
-    transports: ['websocket', 'polling'],
+    transports: ['polling'],
     cors: {
       origin: '*',
       methods: ['GET', 'POST', 'OPTIONS'],
-      allowedHeaders: ['Content-Type'],
-      credentials: false
-    },
-    pingTimeout: 60000,
-    pingInterval: 25000,
-    connectTimeout: 45000
+      allowedHeaders: ['Content-Type']
+    }
   });
 
   // Log all socket.io errors
   io.engine.on('connection_error', (err) => {
     console.error('Socket.io connection error:', {
       code: err.code,
-      message: err.message,
-      context: err.context
+      message: err.message
     });
   });
 
@@ -86,7 +104,6 @@ app.prepare().then(() => {
 
       try {
         currentContent = data;
-        // Emit to all clients including sender
         io.emit('content-update', {
           content: data,
           username: socket.username
@@ -115,6 +132,12 @@ app.prepare().then(() => {
   server.listen(PORT, (err) => {
     if (err) throw err;
     console.log(`> Ready on http://localhost:${PORT}`);
+    console.log('> WebSocket server is running');
+    console.log('> Available endpoints:');
+    console.log('  - GET /api/test (server test)');
+    console.log('  - GET /api/socketio (socket.io test)');
+    console.log('  - WebSocket: /api/socketio');
+    console.log('  - GET /editor (editor page)');
   });
 
   server.on('error', (err) => {

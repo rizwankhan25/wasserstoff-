@@ -14,34 +14,45 @@ class SocketClient {
     if (!this.socket) {
       try {
         console.log('Attempting to connect to socket server...');
-        // Always use localhost:3001 for now since we're testing locally
-        const socketUrl = 'http://localhost:3001';
+        const socketUrl = window.location.origin;
         console.log('Connecting to socket URL:', socketUrl);
 
         // First, try to check if the server is accessible
         try {
           console.log('Testing server accessibility...');
-          const response = await fetch(`${socketUrl}/test`);
-          const data = await response.json();
-          console.log('Server test response:', data);
+          
+          // Test the general server endpoint
+          const serverResponse = await fetch(`${socketUrl}/api/test`);
+          if (!serverResponse.ok) {
+            throw new Error('Server test failed');
+          }
+          const serverData = await serverResponse.json();
+          console.log('Server test response:', serverData);
+
+          // Test the Socket.IO endpoint
+          const socketResponse = await fetch(`${socketUrl}/api/socketio`);
+          if (!socketResponse.ok) {
+            throw new Error('Socket.IO endpoint test failed');
+          }
+          const socketData = await socketResponse.json();
+          console.log('Socket.IO test response:', socketData);
         } catch (error) {
           console.error('Server test failed:', error);
-          throw new Error('Server is not accessible. Make sure the backend server is running on port 3001');
+          throw new Error('Server is not accessible. Make sure the backend server is running');
         }
 
+        // Create socket with minimal configuration
         this.socket = io(socketUrl, {
+          path: '/api/socketio',
           transports: ['polling'],
-          path: '/socket.io/',
           reconnection: true,
           reconnectionAttempts: 5,
-          timeout: 10000,
-          forceNew: true
+          timeout: 10000
         });
 
         // Set up event handlers
         this.socket.on('connect', () => {
           console.log('Socket connected successfully, socket.id:', this.socket.id);
-          console.log('Transport:', this.socket.io.engine.transport.name);
           if (username) {
             console.log('Emitting join event for username:', username);
             this.socket.emit('join', username);
@@ -50,22 +61,15 @@ class SocketClient {
 
         this.socket.on('connect_error', (error) => {
           console.error('Socket connection error:', error);
-          console.log('Current transport:', this.socket.io.engine.transport.name);
           console.log('Error details:', {
             message: error.message,
             description: error.description,
-            type: error.type,
-            context: error
+            type: error.type
           });
         });
 
         this.socket.on('disconnect', (reason) => {
           console.log('Socket disconnected:', reason);
-          console.log('Disconnect details:', {
-            reason,
-            wasConnected: this.socket.connected,
-            transport: this.socket.io.engine.transport.name
-          });
         });
 
         // Wait for connection
