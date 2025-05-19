@@ -10,6 +10,7 @@ const nextConfig = {
   experimental: {
     serverActions: true,
   },
-}
+  output: 'export', // ✅ This line enables static export support
+};
 
 export default nextConfig;
