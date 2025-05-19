@@ -7,7 +7,14 @@ const nextConfig = {
     });
     return config;
   },
-  output: 'export', // ✅ This replaces `next export`
+  async rewrites() {
+    return [
+      {
+        source: '/api/socketio',
+        destination: '/api/socketio',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

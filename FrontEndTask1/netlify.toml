@@ -1,9 +1,22 @@
 [build]
   base = "FrontEndTask1"
-  publish = "out"
   command = "npm run build"
+  publish = ".next"
+
+[[redirects]]
+  from = "/api/socketio/*"
+  to = "/api/socketio"
+  status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[functions]
+  directory = "functions"
+  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

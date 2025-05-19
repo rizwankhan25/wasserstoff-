@@ -15,7 +15,11 @@ class SocketClient {
       try {
         console.log('Attempting to connect to socket server...');
         // Create socket connection
-        this.socket = io('http://localhost:3000', {
+        const socketUrl = process.env.NODE_ENV === 'production' 
+          ? window.location.origin
+          : 'http://localhost:3000';
+
+        this.socket = io(socketUrl, {
           path: '/api/socketio',
           addTrailingSlash: false,
           transports: ['websocket', 'polling'],
