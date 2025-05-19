@@ -7,10 +7,7 @@ const nextConfig = {
     });
     return config;
   },
-  experimental: {
-    serverActions: true,
-  },
-  output: 'export', // ✅ This line enables static export support
+  output: 'export', // ✅ This replaces `next export`
 };
 
 export default nextConfig;
