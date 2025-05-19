@@ -1,0 +1,20 @@
+@import 'bootstrap/dist/css/bootstrap.min.css'; 
+
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Gilroy";
+}
+
+.page-background {
+    min-height: 100vh;
+    /* background: radial-gradient(circle at 70% 30%, #2c0076, #0d0125 60%); */
+    background-color: #000;
+    /* color: #fff; */
+    position: relative;
+    overflow: hidden;
+    font-family: 'Space Mono', monospace;
+  }
+  
